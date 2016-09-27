@@ -1,16 +1,16 @@
 FROM alpine:3.4
 
-MAINTAINER Nikola Petkanski <nikola@petkanski.com>
+MAINTAINER Vincent Composieux <vincent.composieux@gmail.com>
 
 RUN apk add --update nginx
+RUN rm -rf /var/cache/apk/* && rm -rf /tmp/*
 
 ADD nginx.conf /etc/nginx/
 ADD symfony.conf /etc/nginx/conf.d/
 
 RUN echo "upstream php-upstream { server php:9000; }" > /etc/nginx/conf.d/upstream.conf
-RUN adduser -u 1000 -D -g '' -G www-data www-data
 
-RUN rm -rf /var/cache/apk/* && rm -rf /tmp/*
+RUN adduser -D -g '' -G www-data www-data
 
 CMD ["nginx"]
 

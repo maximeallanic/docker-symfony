@@ -1,46 +1,49 @@
+# @Author: Maxime Allanic <mallanic>
+# @Date:   26/09/2016
+# @Email:  maxime@allanic.me
+# @Last modified by:   mallanic
+# @Last modified time: 26/09/2016
+
+
+
 version: '2'
 
 services:
-    data:
-        image: "busybox"
-        volumes:
-            - "/var/lib/mysql"
-            - "../:/var/www/symfony"
-            - "./logs/php:/var/log/php7"
-            - "./logs/symfony:/var/www/symfony/app/logs"
-
     db:
         build: mysql/
-        ports:
-            - "3306"
-        volumes_from:
-            - "data"
         environment:
-            MYSQL_ROOT_PASSWORD: nikola123
+            MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: mydb
             MYSQL_USER: nikola
             MYSQL_PASSWORD: nikola123
+        tmpfs:
+            - "/tmp"
 
     php:
         image: dinamic/docker-alpine-php7
-        ports:
-            - "9000"
-        volumes_from:
-            - "data"
+        volumes:
+            - "./symfony:/var/www/symfony"
+        tmpfs:
+            - "/tmp"
+            - "/run"
 
     nginx:
+        volumes:
+            - "./symfony:/var/www/symfony"
         build: ./nginx
         ports:
-            - "80"
+            - "80:80"
+            - "443:443"
         links:
             - php
-        volumes_from:
-            - "data"
+        tmpfs:
+            - "/tmp"
+            - "/run"
 
-    beanstalk:
-        image: dinamic/docker-alpine-beanstalkd
-        ports:
-            - "11300"
+#    beanstalk:
+#        image: dinamic/docker-alpine-beanstalkd
+#        ports:
+#            - "11300"
 
 
 #    elk:
